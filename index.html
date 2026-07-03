@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>මත්ස්‍ය ව්‍යාපාරිකයෝ | Fish Aquarium</title>
+    <style>
+        /* Google Fonts & Reset */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Sans+Sinhala:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Noto Sans Sinhala', sans-serif;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- THEME COLORS (Variables) --- */
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: white;
+            --text-color: #333;
+            --text-muted: #7f8c8d;
+            --border-color: #e1e8ed;
+            --header-grad: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            --btn-bg: #e1e8ed;
+            --btn-text: #333;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333;
+            --header-grad: linear-gradient(135deg, #111, #222, #333);
+            --btn-bg: #333;
+            --btn-text: #fff;
+        }
+
+        [data-theme="bw"] {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --text-color: #000000;
+            --text-muted: #555555;
+            --border-color: #000000;
+            --header-grad: linear-gradient(135deg, #000, #333, #000);
+            --btn-bg: #000;
+            --btn-text: #fff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* Top Action Bar Element */
+        .top-bar {
+            position: absolute; top: 15px; right: 20px;
+            display: flex; gap: 12px; z-index: 10; align-items: center;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.2); color: white; border: none;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; font-size: 1.2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .icon-btn:hover { background: rgba(255, 255, 255, 0.4); transform: scale(1.05); }
+
+        .settings-menu {
+            position: absolute; top: 60px; right: 0;
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 10px; display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); width: 160px;
+        }
+        .settings-menu.active { display: block; }
+        .settings-menu button {
+            display: block; width: 100%; padding: 8px 10px;
+            background: none; border: none; color: var(--text-color);
+            text-align: left; cursor: pointer; border-radius: 5px; font-size: 0.9rem;
+        }
+        .settings-menu button:hover { background: rgba(0, 114, 255, 0.1); }
+
+        /* Header */
+        header {
+            background: var(--header-grad); color: white;
+            padding: 30px 0; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        header h1 { font-size: 2.5rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin-bottom: 5px; }
+        header p { font-size: 1.1rem; color: #00d2ff; }
+
+        /* Category Container */
+        .category-container {
+            display: flex; justify-content: center; gap: 12px;
+            margin: 30px auto 10px auto; flex-wrap: wrap; max-width: 800px; padding: 0 15px;
+        }
+
+        .cat-btn {
+            background-color: var(--btn-bg); color: var(--btn-text);
+            border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 20px;
+            cursor: pointer; font-weight: 600; font-size: 0.95rem;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05); transition: all 0.2s ease;
+        }
+        .cat-btn:hover, .cat-btn.active {
+            background: linear-gradient(135deg, #00c6ff, #0072ff); color: white;
+            border-color: transparent; transform: translateY(-2px); box-shadow: 0 5px 12px rgba(0,114,255,0.3);
+        }
+
+        /* Grid */
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .fish-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .fish-card {
+            background: var(--card-bg); border-radius: 15px; overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); border: 1px solid var(--border-color); display: block;
+        }
+        .fish-image-wrapper { width: 100%; height: 220px; overflow: hidden; }
+        .fish-image-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .fish-card:hover .fish-image-wrapper img { transform: scale(1.1); }
+        .fish-info { padding: 20px; text-align: center; }
+        .fish-name { font-size: 1.4rem; margin-bottom: 10px; font-weight: 600; }
+        .fish-price { font-size: 1.3rem; color: #e74c3c; font-weight: 700; margin-bottom: 10px; }
+        .contact-number { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; font-weight: bold; }
+
+        .buy-btn {
+            display: inline-block; background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white; padding: 10px 25px; border-radius: 25px;
+            text-decoration: none; font-weight: 600; cursor: pointer; border: none; width: 80%;
+        }
+        .buy-btn:hover { transform: scale(1.05); box-shadow: 0 6px 15px rgba(0,114,255,0.4); }
+
+        /* Popups */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 1000;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-box {
+            background: var(--card-bg); padding: 30px; border-radius: 20px;
+            max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: var(--text-color); border: 1px solid var(--border-color);
+        }
+        .details-container {
+            background: rgba(0, 0, 0, 0.03); padding: 15px; border-radius: 10px;
+            text-align: left; margin: 20px 0; border-left: 5px solid #00d2ff;
+        }
+        .whatsapp-btn { display: inline-block; background: #25D366; color: white; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+        .close-btn { background: #ccc; color: #333; padding: 8px 20px; border-radius: 25px; cursor: pointer; margin-top: 15px; display: inline-block; font-size: 0.9rem; }
+
+        /* Floating Corner Buttons */
+        .floating-contact-btn {
+            position: fixed; bottom: 20px; left: 20px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff); color: white;
+            padding: 12px 20px; border-radius: 30px; font-weight: bold; font-size: 0.95rem;
+            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4); cursor: pointer; z-index: 999; border: none; display: flex; align-items: center; gap: 8px;
+        }
+        .floating-contact-btn:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 8px 20px rgba(0, 114, 255, 0.6); }
+
+        .floating-help-btn {
+            position: fixed; bottom: 20px; right: 20px;
+            background: linear-gradient(135deg, #ff9900, #ff5500); color: white;
+            padding: 12px 20px; border-radius: 30px; font-weight: bold; font-size: 0.95rem;
+            box-shadow: 0 5px 15px rgba(255, 100, 0, 0.4); cursor: pointer; z-index: 999; border: none; display: flex; align-items: center; gap: 8px;
+        }
+        .floating-help-btn:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 8px 20px rgba(255, 100, 0, 0.6); }
+
+        .help-step { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed var(--border-color); text-align: left; }
+        .step-num { display: inline-block; background: #ff5500; color: white; width: 24px; height: 24px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 0.85rem; margin-right: 5px; }
+
+        .contact-link-btn { display: inline-block; width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; text-decoration: none; font-weight: bold; text-align: center; }
+        .c-phone { background: #0072ff; color: white; }
+        .c-wa { background: #25D366; color: white; }
+
+        footer { background-color: #0f2027; color: #8fa1b3; text-align: center; padding: 20px 0; margin-top: 60px; }
+        footer span { color: #00d2ff; }
+    </style>
+</head>
+<body>
+
+    <div id="mainContent">
+        <header>
+            <div class="top-bar">
+                <button class="icon-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
+                <div class="settings-menu" id="settingsMenu">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); padding: 5px 10px; font-weight: bold;">වර්ණ වෙනස් කරන්න:</p>
+                    <button onclick="changeTheme('light')">☀️ Light Mode</button>
+                    <button onclick="changeTheme('dark')">🌙 Dark Mode</button>
+                    <button onclick="changeTheme('bw')">🏁 Black & White</button>
+                </div>
+            </div>
+            <h1>මත්ස්‍ය ව්‍යාපාරිකයෝ</h1>
+            <p>ලස්සනම සහ ගුණාත්මකම විසිතුරු මසුන් <br>බෝතලෙ ඉහලගම (මැදගම)</p>
+        </header>
+
+        <div class="category-container">
+            <button class="cat-btn active" onclick="filterItems('all', this)">📍 සියල්ල (All)</button>
+            <button class="cat-btn" onclick="filterItems('fish', this)">🐠 මසුන් (Fish)</button>
+            <button class="cat-btn" onclick="filterItems('tank', this)">🧼 ටැංකි (Tanks)</button>
+            <button class="cat-btn" onclick="filterItems('food', this)">🧆 කෑම (Fish Food)</button>
+            <button class="cat-btn" onclick="filterItems('light', this)">💡 ලයිට් (Lights)</button>
+        </div>
+
+        <div class="container">
+            <div class="fish-grid" id="itemsGrid">
+                
+                <div class="fish-card" data-category="fish">
+                    <div class="fish-image-wrapper"><img src="https://wallpaperaccess.com/full/1333540.jpg" alt="Fighter"></div>
+                    <div class="fish-info">
+                        <h3 class="fish-name">ෆයිටර් (Fighter Fish)</h3>
+                        <div class="fish-price">රු. 150.00 සිට</div>
+                        <p class="contact-number">📞 0763275596</p>
+                        <button class="buy-btn" onclick="openModal('ෆයිටර් (Fighter Fish)', 'රු. 150.00 සිට', '0763275596', 'බෝතලෙ ඉහලගම', 'විවිධ වර්ණවලින් ලබාගත හැක.')">මිලදී ගන්න</button>
+                    </div>
+                </div>
+
+                <div class="fish-card" data-category="fish">
+                    <div class="fish-image-wrapper"><img src="https://fishsubsidy.org/wp-content/uploads/2019/10/Gold-Dust-Sphenops-Molly.jpg" alt="Molly"></div>
+                    <div class="fish-info">
+                        <h3 class="fish-name">මොලී (Molly Fish)</h3>
+                        <div class="fish-price">රු. 100.00 සිට</div>
+                        <p class="contact-number">📞 0763275596</p>
+                        <button class="buy-btn" onclick="openModal('මොලී (Molly Fish)', 'රු. 100.00 සිට', '0763275596', 'බෝතලෙ ඉහලගම', 'Orange colour.')">මිලදී ගන්න</button>
+                    </div>
+                </div>
+				
+                <div class="fish-card" data-category="fish">
+                    <div class="fish-image-wrapper"><img src="https://tse4.mm.bing.net/th/id/OIP.5Jw6NU4cB2-k8T-kXpaF7AHaE8?rs=1&pid=ImgDetMain&o=7&rm=3" alt="SwordTail"></div>
+                    <div class="fish-info">
+                        <h3 class="fish-name">SwordTail Fish</h3>
+                        <div class="fish-price">රු. 100.00 සිට</div>
+                        <p class="contact-number">📞 0702880865</p>
+                        <button class="buy-btn" onclick="openModal('SwordTail (SwordTail Fish)', 'රු. 100.00 සිට', '0702880865', 'බෝතලෙ ඉහලගම', 'Orange colour.')">මිලදී ගන්න</button>
+                    </div>
+                </div>
+                
+                <div class="fish-card" data-category="fish">
+                    <div class="fish-image-wrapper"><img src="https://thumbs.dreamstime.com/b/side-view-many-koi-carp-isolated-black-background-357864642.jpg?w=768" alt="carp"></div>
+                    <div class="fish-info">
+                        <h3 class="fish-name">Carp (carp Fish)</h3>
+                        <div class="fish-price">රු. 100.00 සිට</div>
+                        <p class="contact-number">📞 0763275596</p>
+                        <button class="buy-btn" onclick="openModal('carp (carp Fish)', 'රු. 100.00 සිට', '0763275596', 'බෝතලෙ ඉහලගම', 'Black & Yellow Spotted ජෝඩු.')">මිලදී ගන්න</button>
+                    </div>
+                </div>
+
+                <div class="fish-card" data-category="food">
+                    <div class="fish-image-wrapper"><img src="https://tse3.mm.bing.net/th/id/OIP.KQ6g6xo2HAPGOknSbb80vAHaHa?w=3024&h=3024&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Food"></div>
+                    <div class="fish-info">
+                        <h3 class="fish-name">Normal Fish Food (50g)</h3>
+                        <div class="fish-price">රු. 80.00</div>
+                        <p class="contact-number">📞 0763275596</p>
+                        <button class="buy-btn" onclick="openModal('Normal Fish Food (50g)', 'රු. 80.00', '0763275596', 'බෝතලෙ ඉහලගම', 'මසුන් සඳහා දිනපතා ලබා දිය හැකි සාමාන්‍ය කෑම වර්ගයකි.')">මිලදී ගන්න</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="floating-contact-btn" onclick="openContactModal()">📞 Contact Us</button>
+        <button class="floating-help-btn" onclick="openHelpModal()">💡 How to Use</button>
+
+        <div class="modal-overlay" id="fishModal">
+            <div class="modal-box">
+                <h2 id="modalFishName">නම</h2>
+                <p style="color: #e74c3c; font-weight: bold; font-size: 1.3rem;" id="modalFishPrice">මිල</p>
+                <div class="details-container">
+                    <p>📍 **ස්ථානය:** <span id="modalFishLocation"></span></p>
+                    <p>📞 **දුරකථන:** <span id="modalFishPhone"></span></p>
+                    <p>📝 **විස්තර:** <span id="modalFishDetails"></span></p>
+                </div>
+                <a href="#" id="whatsAppLink" target="_blank" class="whatsapp-btn">🟢 WhatsApp හරහා ඇණවුම් කරන්න</a>
+                <br>
+                <div class="close-btn" onclick="closeModal()">පසුපසට</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="contactModal">
+            <div class="modal-box">
+                <h2>📞 අපව සම්බන්ධ කරගන්න</h2>
+                <p style="color: var(--text-muted); margin-bottom: 15px;">මත්ස්‍ය ව්‍යාපාරිකයෝ - බෝතලෙ ඉහලගම (මැදගම)</p>
+                <div class="details-container">
+                    <p>📍 **ස්ථානය:** බෝතලෙ ඉහලගම, මැදගම</p>
+                    <p>📞 **ප්‍රධාන දුරකථන අංකය:** 0763275596</p>
+                    <p>⏰ **විවෘත වේලාවන්:** දිනපතා (පෙ.ව. 8:00 - ප.ව. 8:00)</p>
+                </div>
+                <a href="tel:0763275596" class="contact-link-btn c-phone">📞 0763275596 ට කෝල් කරන්න</a>
+                <a href="https://wa.me/94763275596?text=Hi" target="_blank" class="contact-link-btn c-wa">🟢 WhatsApp පණිවිඩයක් එවන්න</a>
+                <br>
+                <div class="close-btn" onclick="closeContactModal()">පසුපසට</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="helpModal">
+            <div class="modal-box">
+                <h2>💡 Admin Panel එක භාවිතා කරන්නේ කෙසේද?</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">පහසුවෙන්ම මසුන් සහ ද්‍රව්‍ය තෝරාගන්නා ආකාරය</p>
+                <div class="help-step"><p><span class="step-num">1</span> **වර්ගීකරණය:** උඩින්ම තියෙන Categories මඟින් ඔයාට අවශ්‍ය දේ වෙන් කරන්න.</p></div>
+                <div class="help-step"><p><span class="step-num">2</span> **විස්තර බැලීම:** "මිලදී ගන්න" ක්ලික් කරලා භාණ්ඩයේ සියලු විස්තර බලන්න.</p></div>
+                <div class="close-btn" style="background: #ff5500; color: white;" onclick="closeHelpModal()">මම වටහාගත්තා 👍</div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 <span>මත්ස්‍ය ව්‍යාපාරිකයෝ</span>. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+
+        function toggleSettings() { document.getElementById('settingsMenu').classList.toggle('active'); }
+        
+        function changeTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('theme', themeName);
+            toggleSettings();
+        }
+
+        function filterItems(category, button) {
+            let buttons = document.querySelectorAll('.cat-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            let cards = document.querySelectorAll('.fish-card');
+            cards.forEach(card => {
+                let cardCategory = card.getAttribute('data-category');
+                if (category === 'all' || cardCategory === category) {
+                    card.style.display = 'block'; 
+                } else {
+                    card.style.display = 'none'; 
+                }
+            });
+        }
+
+        function openModal(name, price, phone, location, details) {
+            document.getElementById('modalFishName').innerText = name;
+            document.getElementById('modalFishPrice').innerText = price;
+            document.getElementById('modalFishPhone').innerText = phone;
+            document.getElementById('modalFishLocation').innerText = location;
+            document.getElementById('modalFishDetails').innerText = details;
+
+            let whatsappMessage = `හලෝ, මම සයිට් එකෙන් දැක්කා "${name}" (${price}) එක ගැන විස්තර දැනගන්න පුලුවන්ද?`;
+            let encodedMessage = encodeURIComponent(whatsappMessage);
+            let formattedPhone = phone.startsWith('0') ? '94' + phone.substring(1) : phone.replace('+', '');
+            document.getElementById('whatsAppLink').href = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
+
+            document.getElementById('fishModal').classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('fishModal').classList.remove('active'); }
+        function openContactModal() { document.getElementById('contactModal').classList.add('active'); }
+        function closeContactModal() { document.getElementById('contactModal').classList.remove('active'); }
+        function openHelpModal() { document.getElementById('helpModal').classList.add('active'); }
+        function closeHelpModal() { document.getElementById('helpModal').classList.remove('active'); }
+
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('fishModal')) closeModal();
+            if (e.target === document.getElementById('contactModal')) closeContactModal();
+            if (e.target === document.getElementById('helpModal')) closeHelpModal();
+        });
+    </script>
+</body>
+</html>
